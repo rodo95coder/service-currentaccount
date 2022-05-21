@@ -43,7 +43,7 @@ public class CurrentAccountController {
 			c.setAccountingBalance(currentAccount.getAccountingBalance());
 			c.setMaintenance(currentAccount.getMaintenance());
 			log.info("a CurrentAccount was updated");
-			return Mono.just(c);
+			return carepo.save(c);
 		});
 	}
 	
