@@ -17,6 +17,8 @@ public class CurrentAccount {
 	@Id
 	private String id;
 	private String idCustomer;
+	private String typeCustomer;
 	private String accountingBalance;
 	private String maintenance;
+	private String profile;
 }

@@ -9,9 +9,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import com.nttdata.bootcamp.exceptions.BusinessCreditNotFoundException;
+import com.nttdata.bootcamp.models.BusinessCredit;
 import com.nttdata.bootcamp.models.CurrentAccount;
 import com.nttdata.bootcamp.services.ICurrentAccountService;
+import com.nttdata.bootcamp.utils.Constants;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -24,6 +28,9 @@ public class CurrentAccountController {
 
 	@Autowired
 	private ICurrentAccountService carepo;
+	
+	@Autowired
+    private WebClient.Builder webClientBuilder;
 	
 	@GetMapping("/findAll")
 	public Flux<CurrentAccount> findAll(){
@@ -50,13 +57,40 @@ public class CurrentAccountController {
 	@PostMapping("/save")
 	public Mono<CurrentAccount> save(@RequestBody CurrentAccount currentAccount){
 		log.info("a CurrentAccount was created");
-		return carepo.save(currentAccount);
+		Flux<BusinessCredit> businessCredits = webClientBuilder
+                .baseUrl("http://service-product-personalcredit")
+                .build()
+                .get()
+                .uri("/businessCredit/findByIdCustomerEnterprise/"+currentAccount.getIdCustomer())
+                .retrieve()
+                .bodyToFlux(BusinessCredit.class);
+		return carepo.save(currentAccount).flatMap(p->{
+			if(businessCredits!=null) {
+				currentAccount.setProfile(Constants.PROFILEPYME);
+			}else {
+				currentAccount.setProfile(Constants.PROFILENONE);
+			}
+			return Mono.just(p);
+		});
+			
 	}
 	
 	@DeleteMapping("/delete")
 	public Mono<Void> delete(@RequestBody CurrentAccount currentAccount){
 		log.info("a CurrentAccount was deleted");
 		return carepo.delete(currentAccount);
+	}
+	
+	@GetMapping("/findByIdCustomer/{idCustomer}")
+	public Flux<CurrentAccount> findByIdCustomer(@PathVariable String idCustomer){
+		log.info("all CurrentAccounts by id customer  were consulted");
+		return carepo.findByIdCustomer(idCustomer);
+	}
+	
+	@GetMapping("/findByIdCustomerAndTypeCustomer/{idCustomer}/{typeCustomer}")
+	public Mono<CurrentAccount> findByIdCustomerAndTypeCustomer(@PathVariable String idCustomer, @PathVariable String typeCustomer){
+		log.info("all CurrentAccounts by id customer  were consulted");
+		return carepo.findByIdCustomerAndTypeCustomer(idCustomer,typeCustomer);
 	}
 	
 }

@@ -15,7 +15,6 @@ public class CurrentAccountImpl implements ICurrentAccountService {
 
 	@Autowired
 	ICurrentAccountRepo carepo;
-	
 
 	@Override
 	public Flux<CurrentAccount> findAll() {
@@ -29,15 +28,22 @@ public class CurrentAccountImpl implements ICurrentAccountService {
 
 	@Override
 	public Mono<CurrentAccount> save(CurrentAccount currentAccount) {
-		// TODO Auto-generated method stub
 		return carepo.save(currentAccount);
 	}
-	
+
 	@Override
 	public Mono<Void> delete(CurrentAccount currentAccount) {
 		return carepo.delete(currentAccount);
 	}
 
-	
+	@Override
+	public Flux<CurrentAccount> findByIdCustomer(String idCustomer) {
+		return carepo.findByIdCustomer(idCustomer);
+	}
+
+	@Override
+	public Mono<CurrentAccount> findByIdCustomerAndTypeCustomer(String idCustomerPerson,String typeCustomer) {
+		return carepo.findByIdCustomerAndTypeCustomer(idCustomerPerson,typeCustomer);
+	}
 	
 }

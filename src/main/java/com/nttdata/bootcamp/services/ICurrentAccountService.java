@@ -10,4 +10,6 @@ public interface ICurrentAccountService {
 	public Mono<CurrentAccount> findById(String id);
 	public Mono<CurrentAccount> save(CurrentAccount currentAccount);
 	public Mono<Void> delete(CurrentAccount currentAccount);
+	public Flux<CurrentAccount> findByIdCustomer(String idCustomer);
+	public Mono<CurrentAccount> findByIdCustomerAndTypeCustomer (String idCustomer, String typeCustomer);
 }
